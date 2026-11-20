@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neurona logística: aprendizaje paso a paso</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<h1>Neurona logística con 3 entradas: ¿concluirá la tarea?</h1>
+<p class="sub">Descenso por gradiente y retropropagación, paso a paso. Entradas de 0 a 9.</p>
+
+<div class="grid">
+  <div>
+    <div class="panel">
+      <h2>Red neuronal</h2>
+      <svg id="net" viewBox="0 0 760 330" role="img" aria-label="Diagrama de la neurona">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#e2e8f0"/></marker>
+        </defs>
+        <g id="conns"></g>
+        <g id="nodes"></g>
+      </svg>
+      <div class="outs">
+        <div class="out yes" id="oYes"><small>✅ SÍ concluirá la tarea</small><b id="pYes">0%</b><div class="bar"><i id="bYes"></i></div></div>
+        <div class="out no" id="oNo"><small>❌ NO concluirá la tarea</small><b id="pNo">0%</b><div class="bar"><i id="bNo"></i></div></div>
+        <div id="warn" class="warn" style="grid-column:1/-1"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Controles</h2>
+    <label>x₁ Puntaje del cuestionario <span id="vx0"></span></label><input type="range" id="x0" min="0" max="9" step="1">
+    <label>x₂ Horas de sueño <span id="vx1"></span></label><input type="range" id="x1" min="0" max="9" step="1">
+    <label>x₃ Actividad social <span id="vx2"></span></label><input type="range" id="x2" min="0" max="9" step="1">
+    <label>y (etiqueta real)</label>
+    <select id="y"><option value="1">1 = Concluyó</option><option value="0">0 = No concluyó</option></select>
+    <label>Learning rate η <span id="veta"></span></label><input type="range" id="eta" min="0.001" max="0.5" step="0.001">
+    <label>Bias b <span id="vb"></span></label><input type="range" id="b" min="-10" max="10" step="0.1">
+    <label>Datos de entrenamiento</label>
+    <select id="mode"><option value="data">Dataset completo (80 casos)</option><option value="one">Solo el ejemplo actual</option></select>
+    <div class="btns">
+      <button onclick="doForward()">Paso Forward</button>
+      <button class="r" onclick="doBackprop()">Backpropagation</button>
+      <button class="p" onclick="trainEpochs(1)">Entrenar 1 Epoch</button>
+      <button class="p" onclick="trainEpochs(10)">Entrenar 10 Epochs</button>
+      <button class="p" onclick="trainEpochs(100)">Entrenar 100 Epochs</button>
+      <button class="g" onclick="startContinuous()">Entrenamiento Continuo</button>
+      <button onclick="stopContinuous()">Pausar</button>
+      <button onclick="randomWeights()">Pesos Aleatorios</button>
+      <button onclick="resetAll()">Reset</button>
+      <button onclick="loadExample(0)">Cargar Ejemplo 1</button>
+      <button onclick="loadExample(1)">Cargar Ejemplo 2</button>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>¿Qué ocurre en cada fase? (con tus números en vivo)</h2>
+  <div class="phases" id="phases"></div>
+</div>
+
+<div class="panel"><h2>Panel de estado</h2><div class="stat" id="stat"></div></div>
+
+<div class="grid">
+  <div class="panel">
+    <h2>Gráfica de pérdida <button onclick="clearChart()" style="float:right">Limpiar</button></h2>
+    <div class="chartbox"><canvas id="chart"></canvas></div>
+  </div>
+  <div class="panel"><h2>Explicación paso a paso</h2><div id="log"></div></div>
+</div>
+
+<div class="panel">
+  <h2>Retropropagación en 3D: el espacio de pesos (w₁, w₂, w₃)</h2>
+  <p class="sub" style="margin-bottom:8px">Arrastra para girar. Cada punto es un juego de pesos; la línea violeta es el recorrido del entrenamiento.</p>
+  <div class="btns" style="margin:0 0 8px"><button id="vbW" class="p" onclick="setView('w')">Espacio de pesos</button><button id="vbS" onclick="setView('s')">Superficie de pérdida (mínimo)</button></div>
+  <svg id="g3d" viewBox="0 0 760 460" role="img" aria-label="Gráfico 3D de la retropropagación"></svg>
+  <div class="leg" id="leg3d"></div>
+</div>
+
+<!-- Scripts normales (no módulos), en este orden: cada archivo usa lo definido en los anteriores -->
+<script src="js/utils.js"></script>
+<script src="js/math.js"></script>
+<script src="js/network-view.js"></script>
+<script src="js/phases.js"></script>
+<script src="js/view3d.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
